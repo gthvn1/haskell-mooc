@@ -115,9 +115,9 @@ longest' lmax [] = lmax
 longest' lmax (l:ls)
   | (length lmax) > (length l) = longest' lmax ls
   | (length lmax) < (length l) = longest' l ls
-  | otherwise = if (head (sort lmax)) < (head (sort l))
-                then longest' l ls
-                else longest' lmax ls
+  | otherwise = if (head lmax) <= (head l)
+                then longest' lmax ls
+                else longest' l ls
 
 ------------------------------------------------------------------------------
 -- Ex 6: Implement the function incrementKey, that takes a list of
@@ -133,8 +133,10 @@ longest' lmax (l:ls)
 --   incrementKey True [(True,1),(False,3),(True,4)] ==> [(True,2),(False,3),(True,5)]
 --   incrementKey 'a' [('a',3.4)] ==> [('a',4.4)]
 
-incrementKey :: k -> [(k,v)] -> [(k,v)]
-incrementKey = todo
+incrementKey :: (Eq k, Num v) => k -> [(k,v)] -> [(k,v)]
+incrementKey k [] = []
+incrementKey k ((a, b):ls) = (a, v) : incrementKey k ls
+  where v = if a == k then b + 1 else b
 
 ------------------------------------------------------------------------------
 -- Ex 7: compute the average of a list of values of the Fractional
@@ -149,7 +151,7 @@ incrementKey = todo
 -- length to a Fractional
 
 average :: Fractional a => [a] -> a
-average xs = todo
+average xs = (sum xs) / (fromIntegral $ length xs)
 
 ------------------------------------------------------------------------------
 -- Ex 8: given a map from player name to score and two players, return
@@ -168,7 +170,12 @@ average xs = todo
 --     ==> "Lisa"
 
 winner :: Map.Map String Int -> String -> String -> String
-winner scores player1 player2 = todo
+winner scores player1 player2 =
+  if (winners' scores player1) >= (winners' scores player2)
+    then player1
+    else player2
+  where winners' s p = case Map.lookup p s of Just x -> x
+                                              Nothing -> 0
 
 ------------------------------------------------------------------------------
 -- Ex 9: compute how many times each value in the list occurs. Return
@@ -183,7 +190,13 @@ winner scores player1 player2 = todo
 --     ==> Map.fromList [(False,3),(True,1)]
 
 freqs :: (Eq a, Ord a) => [a] -> Map.Map a Int
-freqs xs = todo
+freqs xs = go (Map.fromList []) xs
+  where go ml [] = ml
+        go ml (x:xs) = go (Map.alter freqs' x ml) xs
+
+freqs' :: Num a => Maybe a -> Maybe a
+freqs' Nothing = Just 1
+freqs' (Just a) = Just (a + 1)
 
 ------------------------------------------------------------------------------
 -- Ex 10: recall the withdraw example from the course material. Write a
