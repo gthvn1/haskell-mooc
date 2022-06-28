@@ -190,13 +190,10 @@ winner scores player1 player2 =
 --     ==> Map.fromList [(False,3),(True,1)]
 
 freqs :: (Eq a, Ord a) => [a] -> Map.Map a Int
-freqs xs = go (Map.fromList []) xs
-  where go ml [] = ml
-        go ml (x:xs) = go (Map.alter freqs' x ml) xs
-
-freqs' :: Num a => Maybe a -> Maybe a
-freqs' Nothing = Just 1
-freqs' (Just a) = Just (a + 1)
+freqs xs = foldr go (Map.fromList []) xs
+  where go x ml = Map.alter go' x ml
+        go' Nothing = Just 1
+        go' (Just x) = Just (x + 1)
 
 ------------------------------------------------------------------------------
 -- Ex 10: recall the withdraw example from the course material. Write a
