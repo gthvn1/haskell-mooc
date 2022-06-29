@@ -221,7 +221,17 @@ freqs xs = foldr go (Map.fromList []) xs
 --     ==> fromList [("Bob",100),("Mike",50)]
 
 transfer :: String -> String -> Int -> Map.Map String Int -> Map.Map String Int
-transfer from to amount bank = todo
+transfer from to amount bank
+  | Map.notMember from bank = bank
+  | Map.notMember to bank = bank
+  | amount <= 0 || money < amount = bank
+  | otherwise = Map.alter credit to $ Map.alter debit from bank
+  where money = case Map.lookup from bank of Nothing -> 0
+                                             Just x -> x
+        credit Nothing = Just amount
+        credit (Just x) = Just (x + amount)
+        debit Nothing = Just 0
+        debit (Just x) = Just (x - amount)   
 
 ------------------------------------------------------------------------------
 -- Ex 11: given an Array and two indices, swap the elements in the indices.
