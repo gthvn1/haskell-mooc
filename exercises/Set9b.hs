@@ -47,10 +47,10 @@ type Col   = Int
 type Coord = (Row, Col)
 
 nextRow :: Coord -> Coord
-nextRow (i,j) = todo
+nextRow (i,j) = (i + 1, 1)
 
 nextCol :: Coord -> Coord
-nextCol (i,j) = todo
+nextCol (i,j) = (i, j + 1)
 
 --------------------------------------------------------------------------------
 -- Ex 2: Implement the function prettyPrint that, given the size of
@@ -103,8 +103,14 @@ nextCol (i,j) = todo
 type Size = Int
 
 prettyPrint :: Size -> [Coord] -> String
-prettyPrint = todo
-
+prettyPrint s c = go [] (1, 1) s c
+  where
+    printElmt (row, col) c = if (row, col) `elem` c then "Q"
+                                                    else "."
+    go output (row, col) s c
+      | row == s && col == s = output ++ (printElmt (row, col) c) ++ "\n"
+      | col == s             = go (output ++ (printElmt (row, col) c) ++ "\n") (nextRow (row, col)) s c
+      | otherwise            = go (output ++ (printElmt (row, col) c)) (nextCol (row,col)) s c
 --------------------------------------------------------------------------------
 -- Ex 3: The task in this exercise is to define the relations sameRow, sameCol,
 -- sameDiag, and sameAntidiag that check whether or not two coordinates of the
@@ -127,16 +133,16 @@ prettyPrint = todo
 --   sameAntidiag (500,5) (5,500) ==> True
 
 sameRow :: Coord -> Coord -> Bool
-sameRow (i,j) (k,l) = todo
+sameRow (i,j) (k,l) = i == k
 
 sameCol :: Coord -> Coord -> Bool
-sameCol (i,j) (k,l) = todo
+sameCol (i,j) (k,l) = j == l
 
 sameDiag :: Coord -> Coord -> Bool
-sameDiag (i,j) (k,l) = todo
+sameDiag (i,j) (k,l) = (i - j) == (k - l)
 
 sameAntidiag :: Coord -> Coord -> Bool
-sameAntidiag (i,j) (k,l) = todo
+sameAntidiag (i,j) (k,l) = (i + j) == (k + l)
 
 --------------------------------------------------------------------------------
 -- Ex 4: In chess, a queen may capture another piece in the same row, column,
@@ -191,8 +197,10 @@ type Candidate = Coord
 type Stack     = [Coord]
 
 danger :: Candidate -> Stack -> Bool
-danger = todo
-
+danger _ [] = False
+danger c (p:ps)
+  | or [sameRow c p, sameCol c p, sameDiag c p, sameAntidiag c p] = True
+  | otherwise = danger c ps
 --------------------------------------------------------------------------------
 -- Ex 5: In this exercise, the task is to write a modified version of
 -- prettyPrint that marks those empty squares with '#' that are in the
