@@ -233,8 +233,18 @@ danger c (p:ps)
 -- (For those that did the challenge in exercise 2, there's probably no O(n^2)
 -- solution to this version. Any working solution is okay in this exercise.)
 
+
 prettyPrint2 :: Size -> Stack -> String
-prettyPrint2 = todo
+prettyPrint2 s c = go [] (1, 1) s c
+  where
+    printElmt (row, col) c
+      | (row, col) `elem` c = "Q"
+      | danger (row, col) c = "#"
+      | otherwise           =  "."
+    go output (row, col) s c
+      | row == s && col == s = output ++ (printElmt (row, col) c) ++ "\n"
+      | col == s             = go (output ++ (printElmt (row, col) c) ++ "\n") (nextRow (row, col)) s c
+      | otherwise            = go (output ++ (printElmt (row, col) c)) (nextCol (row,col)) s c
 
 --------------------------------------------------------------------------------
 -- Ex 6: Now that we can check if a piece can be safely placed into a square in
